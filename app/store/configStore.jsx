@@ -1,10 +1,11 @@
 import * as redux from 'redux';
 import thunk from 'redux-thunk';
-import { createUserReducer,authReducer } from 'reducers';
+import { createUserReducer,authReducer,userInfoReducer } from 'reducers';
 
 export var configure = () => {
     var reducer = redux.combineReducers({
         user:createUserReducer,
+        userInfo:userInfoReducer,
         auth:authReducer
     });
 

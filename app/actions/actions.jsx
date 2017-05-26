@@ -40,17 +40,36 @@ export var startCreateUser = (email, password,name,contact,age,address,bloodGrp)
             console.log(result);
             console.log('user created')
             var uid=result.uid;
-            var userRef=firebaseRef.child(`users/${uid}`).push(user);
+            var userRef=firebaseRef.child(`users/${uid}`).set(user);
             return userRef.then(()=>{
                 dispatch(createUser({
                     ...user,
-                    id:userRef.key
+                    id:uid
                 }));
             });
         },(error)=>{
             console.log('unable to create user');
         });
 
+    }
+};
+export var toggleDonateBlood=(status)=>{
+    return (dispatch,getState)=>{
+        var uid=getState().auth.uid;
+        return firebaseRef.child(`users/${uid}`).update({donate:status});
+    }
+};
+export var userInfo=(userInfo)=>{
+    return {
+        type: 'USER_INFO',
+        userInfo
+    }
+};
+export var getUserInfo=(uid)=>{
+    return (dispatch,getState)=>{
+        return firebaseRef.child(`users/${uid}`).on('value',(snapshot)=>{
+            dispatch(userInfo(snapshot.val()));
+        });
     }
 };
 export var login= (uid)=>{

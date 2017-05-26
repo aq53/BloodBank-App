@@ -1,24 +1,55 @@
 import React from 'react';
 import * as actions from 'actions';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import Home from 'Home';
 
-var Profile=React.createClass({
-    render(){
-        return(
+var Profile = React.createClass({
+    render() {
+        var userInfo = this.props.userInfo;
+        var name = "Name: " + userInfo.name;
+        var email = "Email: " + userInfo.email;
+        var age = "Age: " + userInfo.age;
+        var contact = "Contact: " + userInfo.contact;
+        var address = "Address: " + userInfo.address;
+        var bloodGrp = "Blood Group: " + userInfo.bloodGrp;
+
+        var status = userInfo.donate;
+        
+        var {dispatch}=this.props;
+        return (
             <div className='row'>
-            <div className='col-lg-4 col-md-offset-4'>
-            <div className="callout-auth">
-                <input type="display" value="Name: "/><br/>
-                <input type="display" value="Email: "/><br/>
-                <input type="display" value="Age: "/><br/>
-                <input type="display" value="Contact: "/><br/>
-                <input type="display" value="Address: "/><br/>
+                <div className='col-lg-4 col-md-offset-4'>
+                    <div className="callout-auth">
+                        {userInfo !== null ?
+                            <div>
+                                <label>
+                                    <input type="checkbox" checked={status} onChange={
+                                        () => {
+                                            dispatch(actions.toggleDonateBlood(!status));
+                                        }
+                                        } />
+                                    Donate Blood
+                            </label>
+                                <br />
+                                <input type="display" value={name} /><br />
+                                <input type="display" value={email} /><br />
+                                <input type="display" value={age} /><br />
+                                <input type="display" value={contact} /><br />
+                                <input type="display" value={address} /><br />
+                                <input type="display" value={bloodGrp} /><br />
+                            </div>
+                            : <h2>Account Not Found</h2>}
+                    </div>
                 </div>
-                </div>
-                </div>
+            </div>
         );
     }
 });
 
-export default connect()(Profile);
+export default connect(
+    (state) => {
+        return {
+            userInfo: state.userInfo,
+        }
+    }
+)(Profile);

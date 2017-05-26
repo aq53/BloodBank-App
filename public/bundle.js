@@ -112,6 +112,7 @@
 	_firebase2.default.auth().onAuthStateChanged(function (user) {
 	    if (user) {
 	        store.dispatch(actions.login(user.uid));
+	        store.dispatch(actions.getUserInfo(user.uid));
 	        hashHistory.push('/home');
 	    } else {
 	        store.dispatch(actions.logout());
@@ -134,7 +135,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.logout = exports.login = exports.startCreateUser = exports.createUser = exports.startLogout = exports.startLogin = undefined;
+	exports.logout = exports.login = exports.getUserInfo = exports.userInfo = exports.toggleDonateBlood = exports.startCreateUser = exports.createUser = exports.startLogout = exports.startLogin = undefined;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -185,14 +186,33 @@
 	            console.log(result);
 	            console.log('user created');
 	            var uid = result.uid;
-	            var userRef = _firebase.firebaseRef.child('users/' + uid).push(user);
+	            var userRef = _firebase.firebaseRef.child('users/' + uid).set(user);
 	            return userRef.then(function () {
 	                dispatch(createUser(_extends({}, user, {
-	                    id: userRef.key
+	                    id: uid
 	                })));
 	            });
 	        }, function (error) {
 	            console.log('unable to create user');
+	        });
+	    };
+	};
+	var toggleDonateBlood = exports.toggleDonateBlood = function toggleDonateBlood(status) {
+	    return function (dispatch, getState) {
+	        var uid = getState().auth.uid;
+	        return _firebase.firebaseRef.child('users/' + uid).update({ donate: status });
+	    };
+	};
+	var userInfo = exports.userInfo = function userInfo(_userInfo) {
+	    return {
+	        type: 'USER_INFO',
+	        userInfo: _userInfo
+	    };
+	};
+	var getUserInfo = exports.getUserInfo = function getUserInfo(uid) {
+	    return function (dispatch, getState) {
+	        return _firebase.firebaseRef.child('users/' + uid).on('value', function (snapshot) {
+	            dispatch(userInfo(snapshot.val()));
 	        });
 	    };
 	};
@@ -29154,6 +29174,18 @@
 	var Profile = _react2.default.createClass({
 	    displayName: 'Profile',
 	    render: function render() {
+	        var userInfo = this.props.userInfo;
+	        var name = "Name: " + userInfo.name;
+	        var email = "Email: " + userInfo.email;
+	        var age = "Age: " + userInfo.age;
+	        var contact = "Contact: " + userInfo.contact;
+	        var address = "Address: " + userInfo.address;
+	        var bloodGrp = "Blood Group: " + userInfo.bloodGrp;
+
+	        var status = userInfo.donate;
+
+	        var dispatch = this.props.dispatch;
+
 	        return _react2.default.createElement(
 	            'div',
 	            { className: 'row' },
@@ -29163,23 +29195,46 @@
 	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'callout-auth' },
-	                    _react2.default.createElement('input', { type: 'display', value: 'Name: ' }),
-	                    _react2.default.createElement('br', null),
-	                    _react2.default.createElement('input', { type: 'display', value: 'Email: ' }),
-	                    _react2.default.createElement('br', null),
-	                    _react2.default.createElement('input', { type: 'display', value: 'Age: ' }),
-	                    _react2.default.createElement('br', null),
-	                    _react2.default.createElement('input', { type: 'display', value: 'Contact: ' }),
-	                    _react2.default.createElement('br', null),
-	                    _react2.default.createElement('input', { type: 'display', value: 'Address: ' }),
-	                    _react2.default.createElement('br', null)
+	                    userInfo !== null ? _react2.default.createElement(
+	                        'div',
+	                        null,
+	                        _react2.default.createElement(
+	                            'label',
+	                            null,
+	                            _react2.default.createElement('input', { type: 'checkbox', checked: status, onChange: function onChange() {
+	                                    dispatch(actions.toggleDonateBlood(!status));
+	                                } }),
+	                            'Donate Blood'
+	                        ),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'display', value: name }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'display', value: email }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'display', value: age }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'display', value: contact }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'display', value: address }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'display', value: bloodGrp }),
+	                        _react2.default.createElement('br', null)
+	                    ) : _react2.default.createElement(
+	                        'h2',
+	                        null,
+	                        'Account Not Found'
+	                    )
 	                )
 	            )
 	        );
 	    }
 	});
 
-	exports.default = (0, _reactRedux.connect)()(Profile);
+	exports.default = (0, _reactRedux.connect)(function (state) {
+	    return {
+	        userInfo: state.userInfo
+	    };
+	})(Profile);
 
 /***/ }),
 /* 274 */
@@ -29626,6 +29681,7 @@
 	var configure = exports.configure = function configure() {
 	    var reducer = redux.combineReducers({
 	        user: _reducers.createUserReducer,
+	        userInfo: _reducers.userInfoReducer,
 	        auth: _reducers.authReducer
 	    });
 
@@ -29683,21 +29739,35 @@
 	    switch (action.type) {
 	        case 'CREATE_USER':
 	            return _extends({}, action.user);
+	        case 'LOGOUT':
+	            return {};
 	        default:
 	            return state;
 	    }
 	};
-	var getBloodGrpReducer = exports.getBloodGrpReducer = function getBloodGrpReducer() {
-	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+	var userInfoReducer = exports.userInfoReducer = function userInfoReducer() {
+	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	    var action = arguments[1];
 
 	    switch (action.type) {
-	        case 'GET_BLOOD_GROUP':
-	            return action.bloodGrp;
+	        case 'USER_INFO':
+	            return action.userInfo;
+
+	        case 'LOGOUT':
+	            return {};
+
 	        default:
 	            return state;
 	    }
 	};
+	// export var getBloodGrpReducer=(state='',action)=>{
+	//     switch(action.type){
+	//         case 'GET_BLOOD_GROUP':
+	//             return action.bloodGrp;
+	//         default:
+	//             return state;
+	//     }
+	// };
 	var authReducer = exports.authReducer = function authReducer() {
 	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	    var action = arguments[1];
