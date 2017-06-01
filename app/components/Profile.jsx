@@ -17,8 +17,9 @@ var Profile = React.createClass({
         
         var {dispatch}=this.props;
         return (
+            <div className="container">
             <div className='row'>
-                <div className='col-lg-4 col-md-offset-4'>
+                <div className='col-lg-8 col-md-offset-2'>
                     <div className="callout-auth">
                         {userInfo !== null ?
                             <div>
@@ -31,6 +32,7 @@ var Profile = React.createClass({
                                     Donate Blood
                             </label>
                                 <br />
+                                <div className="form">
                                 <input type="display" value={name} /><br />
                                 <input type="display" value={email} /><br />
                                 <input type="display" value={age} /><br />
@@ -38,9 +40,11 @@ var Profile = React.createClass({
                                 <input type="display" value={address} /><br />
                                 <input type="display" value={bloodGrp} /><br />
                             </div>
+                            </div>
                             : <h2>Account Not Found</h2>}
                     </div>
                 </div>
+            </div>
             </div>
         );
     }

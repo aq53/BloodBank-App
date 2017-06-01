@@ -4,8 +4,14 @@ import { connect } from 'react-redux';
 import * as actions from 'actions';
 import Home from 'Home';
 import firebase, { firebaseRef } from 'app/firebase/';
+var { Link } = require('react-router');
+
+
+import AppBar from 'material-ui/AppBar';
+import FlatButton from 'material-ui/FlatButton';
 
 var Login = React.createClass({
+    
     handleSignUpBtn(e) {
         e.preventDefault();
         hashHistory.push('/signup');
@@ -13,31 +19,48 @@ var Login = React.createClass({
     handleSubmit(e) {
         e.preventDefault();
         var email = this.refs.email.value;
-        var password=this.refs.password.value;
-        var {dispatch}=this.props;
-        dispatch(actions.startLogin(email,password));
+        var password = this.refs.password.value;
+        var { dispatch } = this.props;
+        dispatch(actions.startLogin(email, password));
+    },
+    loginRender(){
+        hashHistory.push("/");
+    },
+    signUpRender(){
+        hashHistory.push("/signup");
     },
     render() {
         return (
+            <div>
+            <AppBar
+                title={<span>Blood Bank App</span>}
+
+                iconElementRight={
+                    <div className="links">
+                        <FlatButton onClick={this.loginRender}> Login</FlatButton>
+                        <FlatButton onClick={this.signUpRender}>Sign Up</FlatButton>
+                    </div>
+                }
+            />
             <div className="container">
-                <div className="page-actions">
-                    <a onClick={this.handleSignUpBtn} href="#">Sign Up</a>
-                </div>
-                <h1 className="page-title">Blood Bank App</h1>
-                <div className="row">
-                    <div className="col-lg-8 col-md-offset-2">
-                        <div className="callout-auth">
-                            <h3>Login</h3>
-                            <form onSubmit={this.handleSubmit}>
-                                <input type="text" ref="email" placeholder="Email" required /><br/>
-                                <input type="password" ref="password" placeholder="Password" required /><br />
-                                <input type="Submit" className="btn btn-danger" />
-                            </form>
+                    <div className="row">
+                        <div className="col-lg-8 col-md-offset-2">
+                            <div className="callout-auth">
+                                <h3>Login</h3>
+                                <div className="form">
+                                <form onSubmit={this.handleSubmit}>
+                                    <input type="text" ref="email" placeholder="Enter Email" required /><br/>
+                                    <input type="password" ref="password" placeholder="Enter Password" required /><br />
+                                    <input type="Submit" className="btn btn-info" />
+                                </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+        </div>
         );
+
     }
 });
 

@@ -1,7 +1,10 @@
 var React = require('react');
-var { Link } = require('react-router');
+var { hashHistory } = require('react-router');
 import * as actions from 'actions';
 import { connect } from 'react-redux';
+
+import AppBar from 'material-ui/AppBar';
+import FlatButton from 'material-ui/FlatButton';
 
 var Nav = React.createClass({
   onLogout(e) {
@@ -12,15 +15,18 @@ var Nav = React.createClass({
   },
   render() {
     return (
-      <div>
-        {/*<h2>Nav Component</h2>*/}
-        <div className="page-actions">
-          <Link to="/home">Home</Link>
-          <Link to="/home/profile">Profile</Link>
-          <Link to="/home/donors">Donors</Link>
-          <a onClick={this.onLogout} href="#">Logout</a>
-        </div>
-      </div>
+      <AppBar
+        title={<span>Blood Bank App</span>}
+
+        iconElementRight={
+          <div>
+            <FlatButton onClick={()=>{hashHistory.push("/home")}}>Home</FlatButton>
+            <FlatButton onClick={()=>{hashHistory.push("/home/profile")}}>Profile</FlatButton>
+            <FlatButton onClick={()=>{hashHistory.push("/home/donors")}}>Donors</FlatButton>
+            <FlatButton onClick={this.onLogout}>Logout</FlatButton>
+          </div>
+        }
+      />
     );
   }
 });

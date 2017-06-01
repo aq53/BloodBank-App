@@ -65,6 +65,19 @@ export var userInfo=(userInfo)=>{
         userInfo
     }
 };
+export var donorsInfo=(donors)=>{
+    return {
+        type: 'GET_DONORS_INFO',
+        donors
+    };
+};
+export var getDonorsInfo=()=>{
+    return (dispatch,getState)=>{
+        return firebaseRef.child('users').on('value',(snapshot)=>{
+            dispatch(donorsInfo(snapshot.val()));
+        });
+    }
+};
 export var getUserInfo=(uid)=>{
     return (dispatch,getState)=>{
         return firebaseRef.child(`users/${uid}`).on('value',(snapshot)=>{

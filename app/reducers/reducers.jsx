@@ -22,6 +22,16 @@ export var userInfoReducer=(state={},action)=>{
             return state;
     }
 };
+export var donorsInfoReducer=(state={},action)=>{
+    switch(action.type){
+        case 'GET_DONORS_INFO':
+            return action.donors;
+        case 'LOGOUT':
+            return {};
+        default:
+            return state;
+    }
+};
 // export var getBloodGrpReducer=(state='',action)=>{
 //     switch(action.type){
 //         case 'GET_BLOOD_GROUP':
