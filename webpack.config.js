@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 module.exports = {
     entry: [
         'script!jquery/dist/jquery.min.js',
@@ -11,8 +12,13 @@ module.exports = {
     },
     plugins: [
         new webpack.ProvidePlugin({
-        '$': 'jquery',
-        'jQuery': 'jquery'
+            '$': 'jquery',
+            'jQuery': 'jquery'
+        }),
+        new webpack.optimize.UglifyJsPlugin({
+            compressor:{
+                warnings:false
+            }
         })
     ],
     output: {
@@ -27,26 +33,26 @@ module.exports = {
             './app/api',
         ],
         alias: {
-            app:'app',
+            app: 'app',
             actions: 'app/actions/actions.jsx',
             reducers: 'app/reducers/reducers.jsx',
             configStore: 'app/store/configStore.jsx'
         },
-        
-        extensions: ['','.js','.jsx']
-    },
-    
 
-module: {
-    loaders: [
-        {
-            loader: 'babel-loader',
-            query: {
-                presets: ['react', 'es2015', 'stage-0']
-            },
-            test: /\.jsx?$/,
-            exclude: /(node_modules|bower_components)/
-        }
-    ]
-}
+        extensions: ['', '.js', '.jsx']
+    },
+
+
+    module: {
+        loaders: [
+            {
+                loader: 'babel-loader',
+                query: {
+                    presets: ['react', 'es2015', 'stage-0']
+                },
+                test: /\.jsx?$/,
+                exclude: /(node_modules|bower_components)/
+            }
+        ]
+    }
 };
